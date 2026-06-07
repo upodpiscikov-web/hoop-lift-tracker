@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hoop & Lift Tracker</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">Progress tracker</p>
+          <h1>Hoop & Lift</h1>
+        </div>
+        <div class="summary-strip" aria-label="Training summary">
+          <div>
+            <span id="monthTrainCount">0</span>
+            <small>trained this month</small>
+          </div>
+          <div>
+            <span id="bestShooting">0%</span>
+            <small>best session</small>
+          </div>
+          <div>
+            <span id="latestLift">-</span>
+            <small>latest lift</small>
+          </div>
+        </div>
+      </header>
+
+      <section class="auth-panel" id="authPanel">
+        <div>
+          <h2 id="authTitle">Sign in</h2>
+          <p id="authHelp">Use your email and password to save progress long-term in Supabase.</p>
+        </div>
+        <form class="auth-form" id="authForm">
+          <input id="authEmail" type="email" placeholder="Email" autocomplete="email" required />
+          <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password" required />
+          <button class="primary-button" id="signInButton" type="submit">Sign in</button>
+          <button class="secondary-button" id="signUpButton" type="button">Create account</button>
+        </form>
+        <div class="user-bar hidden" id="userBar">
+          <span id="userEmail"></span>
+          <button class="secondary-button" id="signOutButton" type="button">Sign out</button>
+        </div>
+      </section>
+
+      <p class="status-message" id="statusMessage"></p>
+
+      <nav class="tabs" aria-label="Tracker tabs">
+        <button class="tab-button active" data-tab="calendar" type="button">Calendar</button>
+        <button class="tab-button" data-tab="shooting" type="button">Shooting</button>
+        <button class="tab-button" data-tab="lifting" type="button">Lifting</button>
+      </nav>
+
+      <section class="tab-panel active" id="calendarPanel">
+        <div class="section-head">
+          <div>
+            <h2>Training Calendar</h2>
+            <p>Check off the days you trained basketball, lifted, or did both.</p>
+          </div>
+          <div class="month-controls">
+            <button class="icon-button" id="prevMonth" type="button" aria-label="Previous month">&lt;</button>
+            <strong id="monthLabel">Month</strong>
+            <button class="icon-button" id="nextMonth" type="button" aria-label="Next month">&gt;</button>
+          </div>
+        </div>
+        <div class="calendar-legend">
+          <span><i class="dot basketball"></i>Basketball</span>
+          <span><i class="dot lifting"></i>Lifting</span>
+        </div>
+        <div class="calendar-grid" id="calendarGrid" aria-label="Monthly training calendar"></div>
+      </section>
+
+      <section class="tab-panel" id="shootingPanel">
+        <div class="section-head">
+          <div>
+            <h2>Shooting Sessions</h2>
+            <p>Add makes and attempts by shot type and court spot.</p>
+          </div>
+        </div>
+
+        <div class="split-layout">
+          <form class="tool-panel" id="shootingForm">
+            <label>
+              Date
+              <input id="shotDate" type="date" required />
+            </label>
+            <label>
+              Shot type
+              <select id="shotType" required>
+                <option value="3 Pointers">3 Pointers</option>
+                <option value="Free Throws">Free Throws</option>
+                <option value="Midrange">Midrange</option>
+              </select>
+            </label>
+            <label>
+              Court spot
+              <select id="shotSpot" required>
+                <option value="Right Corner">Right Corner</option>
+                <option value="Right 45">Right 45</option>
+                <option value="Top of the Key">Top of the Key</option>
+                <option value="Left 45">Left 45</option>
+                <option value="Left Corner">Left Corner</option>
+                <option value="Center FT">Center FT</option>
+              </select>
+            </label>
+            <div class="form-row">
+              <label>
+                Made
+                <input id="shotsMade" type="number" min="0" step="1" value="0" required />
+              </label>
+              <label>
+                Taken
+                <input id="shotsTaken" type="number" min="1" step="1" value="10" required />
+              </label>
+            </div>
+            <button class="primary-button" type="submit">Add shooting data</button>
+          </form>
+
+          <div class="chart-panel">
+            <div class="chart-title">
+              <h3>Percentages by session</h3>
+              <select id="chartFilter" aria-label="Filter chart">
+                <option value="All">All shots</option>
+                <option value="3 Pointers">3 Pointers</option>
+                <option value="Free Throws">Free Throws</option>
+                <option value="Midrange">Midrange</option>
+              </select>
+            </div>
+            <canvas id="shootingChart" width="820" height="360" aria-label="Shooting percentage chart"></canvas>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Spot</th>
+                <th>Makes</th>
+                <th>Attempts</th>
+                <th>Percent</th>
+                <th>Change</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="shootingRows"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="liftingPanel">
+        <div class="section-head">
+          <div>
+            <h2>Lifting Log</h2>
+            <p>Track the main lift, weight, reps, and estimated one-rep max.</p>
+          </div>
+        </div>
+        <div class="split-layout">
+          <form class="tool-panel" id="liftingForm">
+            <label>
+              Date
+              <input id="liftDate" type="date" required />
+            </label>
+            <label>
+              Exercise
+              <input id="exerciseName" type="text" placeholder="Bench press" required />
+            </label>
+            <div class="form-row">
+              <label>
+                Weight
+                <input id="liftWeight" type="number" min="0" step="2.5" value="60" required />
+              </label>
+              <label>
+                Reps
+                <input id="liftReps" type="number" min="1" step="1" value="5" required />
+              </label>
+            </div>
+            <button class="primary-button" type="submit">Add lift</button>
+          </form>
+
+          <div class="chart-panel">
+            <div class="chart-title">
+              <h3>Estimated max trend</h3>
+            </div>
+            <canvas id="liftingChart" width="820" height="360" aria-label="Lifting progress chart"></canvas>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Exercise</th>
+                <th>Weight</th>
+                <th>Reps</th>
+                <th>Est. 1RM</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="liftingRows"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="./supabase-config.js"></script>
+    <script src="./app.js"></script>
+  </body>
+</html>
